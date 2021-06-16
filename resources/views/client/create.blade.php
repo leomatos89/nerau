@@ -42,7 +42,7 @@
 
                         <div class="col-md-7">
                             <label for="logradouro" class="form-label">logradouro</label>
-                            <input type="text" name="addlogradouroress" id="logradouro" class="form-control">
+                            <input type="text" name="logradouro" id="logradouro" class="form-control">
                         </div>
                     </div>
 

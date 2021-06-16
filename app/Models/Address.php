@@ -9,4 +9,7 @@ class Address extends Model
 {
     use HasFactory;
     protected $table = "addresses";
+    public $timestamps = true;
+    protected $fillable = ['cep','localidade','logradouro','complemento','bairro','uf'];
+
 }
