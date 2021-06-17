@@ -42,17 +42,17 @@ class ClientController extends Controller
     {
         //Validações do fomulário
         $request->validate([
-            'name' => 'required|min:4|max:30',
-            'cpf' => 'required|formato_cpf|cpf|unique:clients,cpf|max:14',
-            'email' => 'required|email|unique:emails,email|max:30',
-            'phone' => 'required|telefone|max:9',
-            'celphone' => 'required|Celular|max:10',
-            'cep' => 'required|formato_cep|max:9',
-            'localidade' => 'required',
-            'logradouro' => 'required',
-            'complemento' => 'required',
-            'bairro' => 'required',
-            'uf' => 'required|uf|max:2',
+            'name' => 'required|min:4|max:30|regex:/^[a-zA-Z ]+$/',
+            'cpf' => 'required|formato_cpf|cpf|max:14|unique:clients,cpf',
+            'email' => 'required|email|max:30|unique:emails,email',
+            'phone' => 'required|telefone|max:9|nullable|alpha_dash',
+            'celphone' => 'required|Celular|max:10|alpha_dash',
+            'cep' => 'required|formato_cep|max:9|alpha_dash',
+            'localidade' => 'required|max:30',
+            'logradouro' => 'required|max:30',
+            'complemento' => 'required|max:30',
+            'bairro' => 'required|max:30',
+            'uf' => 'required|uf|max:2|alpha',
         ]);
 
         // Array associativo do cliente
@@ -106,6 +106,7 @@ class ClientController extends Controller
      */
     public function show($id)
     {
+        //buscando os registros para tela de exibição
         $client = Client::find($id);
         $address = Address::where(["id_client" => $client->id])->first();
         $email = Email::where(["id_client" => $client->id])->first();
@@ -121,10 +122,12 @@ class ClientController extends Controller
      */
     public function edit($id)
     {
+        // Buscando os registros para pagina de update
         $client = Client::find($id);
         $address = Address::where(["id_client" => $client->id])->first();
         $email = Email::where(["id_client" => $client->id])->first();
         $phone = Phone::where(["id_client" => $client->id])->first();
+        
         return view('client.create', compact('client', 'address','email','phone'));
     }
 
@@ -139,17 +142,17 @@ class ClientController extends Controller
     {
         // Validações do formulário
         $request->validate([
-            'name' => 'required|min:4|max:30',
+            'name' => 'required|min:4|max:30|regex:/^[a-zA-Z ]+$/',
             'cpf' => 'required|formato_cpf|cpf|max:14',
             'email' => 'required|email|max:30',
-            'phone' => 'required|telefone|max:9',
-            'celphone' => 'required|Celular|max:10',
-            'cep' => 'required|formato_cep|max:9',
-            'localidade' => 'required',
-            'logradouro' => 'required',
-            'complemento' => 'required',
-            'bairro' => 'required',
-            'uf' => 'required|uf|max:2',
+            'phone' => 'required|telefone|max:9|nullable|alpha_dash',
+            'celphone' => 'required|Celular|max:10|alpha_dash',
+            'cep' => 'required|formato_cep|max:9|alpha_dash',
+            'localidade' => 'required|max:30',
+            'logradouro' => 'required|max:30',
+            'complemento' => 'required|max:30',
+            'bairro' => 'required|max:30',
+            'uf' => 'required|uf|max:2|alpha',
         ]);
 
         // Buscando o registro do cliente na tabela clients
@@ -201,6 +204,7 @@ class ClientController extends Controller
      */
     public function destroy($id)
     {
+        // busca o registro do cliente para ser deletado. Obs: delete cascade.
         $client = Client::find($id);
         $client->delete();
         return redirect()->route('client.index')->with('msg', "Cliente deletado com sucesso!");
