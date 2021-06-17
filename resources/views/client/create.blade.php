@@ -31,13 +31,19 @@
                         <div class="col">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" name="email" id="email" class="form-control"
-                                placeholder="exemplo@exemplo.com" value="{{$client->email ?? old('email')}}">
+                                placeholder="exemplo@exemplo.com" value="{{$email->email ?? old('email')}}">
                         </div>
 
                         <div class="col">
-                            <label for="phone" class="form-label">Telefone</label>
-                            <input type="text" name="phone" id="phone" class="form-control" placeholder="12345-6789"
-                                value="{{$client->phone ?? old('phone')}}">
+                            <label for="celphone" class="form-label">Telefone Celular</label>
+                            <input type="text" name="celphone" id="celphone" class="form-control" placeholder="12345-6789"
+                                value="{{$phone->celphone ?? old('celphone')}}" maxlength="10">
+                        </div>
+
+                        <div class="col">
+                            <label for="phone" class="form-label">Telefone Fixo</label>
+                            <input type="text" name="phone" id="phone" class="form-control" placeholder="1234-5678"
+                                value="{{$phone->phone ?? old('phone')}}" maxlength="9">
                         </div>
                     </div>
                     <div class=" row mb-3">

@@ -38,11 +38,18 @@
                     <tbody>
                         <!-- Percorre todos os clientes da tabela clients -->
                         @foreach ($clients as $client)
+                        @php
+                            $email_search = new App\Models\Email;
+                            $phone_search = new App\Models\Phone;
+
+                            $email = $email_search->find($client->id);
+                            $phone = $phone_search->find($client->id);
+                        @endphp
                         <tr>
                             <td>{{$client->name ?? ''}}</td>
                             <td>{{$client->cpf ?? ''}}</td>
-                            <td>{{$client->email ?? ''}}</td>
-                            <td>{{$client->phone ?? ''}}</td>
+                            <td>{{$email->email ?? ''}}</td>
+                            <td>{{$phone->phone ?? ''}}</td>
                             <td><a href="{{route('client.show',$client->id)}}">Visualizar</a></td>
                             <td class="text-center in-line">
                                 <form action="{{route('client.destroy',$client->id)}}" method="POST">

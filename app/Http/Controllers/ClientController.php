@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use App\Models\Client;
+use App\Models\Email;
+use App\Models\Phone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -42,8 +44,9 @@ class ClientController extends Controller
         $request->validate([
             'name' => 'required|min:4|max:30',
             'cpf' => 'required|formato_cpf|cpf|unique:clients,cpf|max:14',
-            'email' => 'required|email|unique:clients,email|max:30',
-            'phone' => 'required|Celular|unique:clients,phone|max:10',
+            'email' => 'required|email|unique:emails,email|max:30',
+            'phone' => 'required|telefone|max:9',
+            'celphone' => 'required|Celular|max:10',
             'cep' => 'required|formato_cep|max:9',
             'localidade' => 'required',
             'logradouro' => 'required',
@@ -51,7 +54,15 @@ class ClientController extends Controller
             'bairro' => 'required',
             'uf' => 'required|uf|max:2',
         ]);
-        // Array associativo do endereço
+
+        // Array associativo do cliente
+        $client = [
+            'name' => $request->name,
+            'cpf' => $request->cpf,
+        ];
+        Client::create($client);
+
+        // Array associativo do endereço, usando o id do ultimo cliente adicionado como referencia para id_client
         $address = [
             'cep' => $request->cep,
             'localidade' => $request->localidade,
@@ -59,22 +70,30 @@ class ClientController extends Controller
             'complemento' => $request->complemento,
             'bairro' => $request->bairro,
             'uf' => $request->uf,
-        ];
-
-        Address::create($address);
-        
-        // Array associativo do cliente, pegando o ultimo registro de endereço como id no id_address
-        $client = [
-            'name' => $request->name,
-            'cpf' => $request->cpf,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'id_address' => DB::table('addresses')
+            'id_client' => DB::table('clients')
                 ->latest()
                 ->first()->id
         ];
+        Address::create($address);
 
-        Client::create($client);
+        // Array associativo do email,  usando o id do ultimo cliente adicionado como referencia para id_client
+        $email = [
+            'email' => $request->email,
+            'id_client' => DB::table('clients')
+                ->latest()
+                ->first()->id
+        ];
+        Email::create($email);
+
+        // Array associativo do phone,  usando o id do ultimo cliente adicionado como referencia para id_client
+        $phone = [
+            'phone' => $request->phone,
+            'celphone' => $request->celphone,
+            'id_client' => DB::table('clients')
+                ->latest()
+                ->first()->id
+        ];
+        Phone::create($phone);
 
         return redirect()->route('client.index')->with('msg', "Cliente adicionado com sucesso!");
     }
@@ -88,8 +107,10 @@ class ClientController extends Controller
     public function show($id)
     {
         $client = Client::find($id);
-        $address = Address::where(["id" => $client->id_address])->first();
-        return view('client.view', compact('client', 'address'));
+        $address = Address::where(["id_client" => $client->id])->first();
+        $email = Email::where(["id_client" => $client->id])->first();
+        $phone = Phone::where(["id_client" => $client->id])->first();
+        return view('client.view', compact('client', 'address','email','phone'));
     }
 
     /**
@@ -100,10 +121,11 @@ class ClientController extends Controller
      */
     public function edit($id)
     {
-
         $client = Client::find($id);
-        $address = Address::where(["id" => $client->id_address])->first();
-        return view('client.create', compact('client', 'address'));
+        $address = Address::where(["id_client" => $client->id])->first();
+        $email = Email::where(["id_client" => $client->id])->first();
+        $phone = Phone::where(["id_client" => $client->id])->first();
+        return view('client.create', compact('client', 'address','email','phone'));
     }
 
     /**
@@ -120,7 +142,8 @@ class ClientController extends Controller
             'name' => 'required|min:4|max:30',
             'cpf' => 'required|formato_cpf|cpf|max:14',
             'email' => 'required|email|max:30',
-            'phone' => 'required|Celular|max:10',
+            'phone' => 'required|telefone|max:9',
+            'celphone' => 'required|Celular|max:10',
             'cep' => 'required|formato_cep|max:9',
             'localidade' => 'required',
             'logradouro' => 'required',
@@ -129,7 +152,18 @@ class ClientController extends Controller
             'uf' => 'required|uf|max:2',
         ]);
 
-        // Array associativo do endereço
+        // Buscando o registro do cliente na tabela clients
+        $client = Client::find($id);
+
+        // Array associativo do cliente , atualizando as colunas e alterando a coluna update para o dia atual.
+           $client_data = [
+            'name' => $request->name,
+            'cpf' => $request->cpf,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        Client::where(['id' => $client->id])->update($client_data);
+
+        // Array associativo do endereço, atualizando as colunas e alterando a coluna update para o dia atual.
         $address = [
             'cep' => $request->cep,
             'localidade' => $request->localidade,
@@ -139,21 +173,22 @@ class ClientController extends Controller
             'uf' => $request->uf,
             'updated_at' => date('Y-m-d H:i:s')
         ];
+        Address::where(['id_client' => $client->id])->update($address);
 
-        $client = Client::find($id);
-
-        Address::where(['id' => $client->id_address])->update($address);
-
-        // Array associativo do cliente
-        $client_data = [
-            'name' => $request->name,
-            'cpf' => $request->cpf,
+        // Array associativo do email,  atualizando as colunas e alterando a coluna update para o dia atual.
+        $email = [
             'email' => $request->email,
-            'phone' => $request->phone,
             'updated_at' => date('Y-m-d H:i:s')
         ];
+        Email::where(['id_client' => $client->id])->update($email);
 
-        Client::where(['id' => $client->id])->update($client_data);
+        // Array associativo do phone,  atualizando as colunas e alterando a coluna update para o dia atual.
+        $phone = [
+            'phone' => $request->phone,
+            'celphone' => $request->celphone,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        Phone::where(['id_client' => $client->id])->update($phone);
 
         return redirect()->route('client.index')->with('msg', "Cliente alterado com sucesso!");
     }

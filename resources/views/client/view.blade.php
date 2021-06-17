@@ -18,11 +18,15 @@
                 </tr>
                 <tr>
                     <th>Email: </th>
-                    <td>{{$client->email}}</td>
+                    <td>{{$email->email}}</td>
                 </tr>
                 <tr>
-                    <th>Telefone: </th>
-                    <td>{{$client->phone}}</td>
+                    <th>Telefone Fixo: </th>
+                    <td>{{$phone->phone}}</td>
+                </tr>
+                <tr>
+                    <th>Telefone Celular: </th>
+                    <td>{{$phone->celphone}}</td>
                 </tr>
                 <tr>
                     <th>CEP: </th>

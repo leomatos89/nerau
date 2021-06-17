@@ -17,10 +17,6 @@ class CreateClientsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('cpf');
-            $table->string('email');
-            $table->string('phone');
-            $table->bigInteger('id_address')->unsigned();
-            $table->foreign('id_address')->references('id')->on('addresses')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
